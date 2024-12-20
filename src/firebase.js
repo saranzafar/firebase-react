@@ -9,6 +9,6 @@ const firebaseConfig = {
     messagingSenderId: "1078550867685",
     appId: "1:1078550867685:web:fcd47b1b6e1741a557ae0c",
     databaseURL: "https://app-6f096-default-rtdb.firebaseio.com/",
-};
+}
 
 export const app = initializeApp(firebaseConfig);

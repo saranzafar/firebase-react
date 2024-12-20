@@ -1,36 +1,21 @@
-import { useState } from "react";
-import { UseFirebase } from "./context/Firebase"
+import { getAuth } from "firebase/auth"
+import { app } from "./firebase"
+import { useEffect, useState } from "react"
+import SignUp from "./pages/Signup"
+
 
 function App() {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const auth = getAuth(app)
+    const [user, setUser] = useState(null)
 
 
-    const firebase = UseFirebase()
-    console.log("firebase = ", firebase);
+    // useEffect(()=>{},[])
 
     return (
+
         <div>
             <h1>Firebase</h1>
-            <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="enter your email" />
-
-            <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                placeholder="enter your password" />
-
-            <button
-                onClick={() => {
-                    firebase.signupUserWithEmailAndPassword(email, password)
-                    firebase.putData("storedataincorrectway/test", { email, password })
-                }}>
-                Signup
-            </button>
+            <SignUp />
         </div>
     )
 }

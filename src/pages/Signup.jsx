@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from 'react';
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { app } from "../firebase";
 
 function SignUp() {
@@ -7,6 +7,7 @@ function SignUp() {
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider()
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -24,6 +25,10 @@ function SignUp() {
                 setIsSubmitting(false)
             });
     };
+
+    const signupWithgoogle = () => {
+        signInWithPopup(auth, googleProvider)
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -54,10 +59,18 @@ function SignUp() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    <div>
+                    <div className='flex gap-4 flex-col'>
+                        <button
+                            className="w-full px-4 py-2 text-white bg-gray-500 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            disabled={isSubmitting}
+                            onClick={signupWithgoogle}
+                        >
+                            Continue with google
+                        </button>
                         <button
                             type="submit"
                             className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            disabled={isSubmitting}
                         >
                             Register
                         </button>
