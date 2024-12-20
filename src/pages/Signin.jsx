@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../firebase";
 
-function SignUp() {
+function Signin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -11,10 +11,10 @@ function SignUp() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmitting(true)
-        createUserWithEmailAndPassword(auth, email, password)
+        signInWithEmailAndPassword(auth, email, password)
             .then((response) => {
                 console.log("REsponse", response);
-                alert("User created successfully");
+                alert("User Signin successfully");
             }).catch((error) => {
                 console.log("Error", error);
                 alert("Error occurred");
@@ -28,7 +28,7 @@ function SignUp() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-                <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+                <h2 className="text-2xl font-bold text-center">Sign In</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
@@ -59,7 +59,7 @@ function SignUp() {
                             type="submit"
                             className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            Register
+                            Sign In
                         </button>
                     </div>
                 </form>
@@ -68,4 +68,4 @@ function SignUp() {
     );
 }
 
-export default SignUp;
+export default Signin;
