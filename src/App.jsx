@@ -1,7 +1,8 @@
-import { getAuth } from "firebase/auth"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { app } from "./firebase"
 import { useEffect, useState } from "react"
 import SignUp from "./pages/Signup"
+import Signin from "./pages/Signin"
 
 
 function App() {
@@ -9,13 +10,32 @@ function App() {
     const [user, setUser] = useState(null)
 
 
-    // useEffect(()=>{},[])
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("You are signed in: ", user);
+                setUser(user)
+            }
+            else {
+                console.log("You are signed out");
+                setUser(null)
+            }
+        })
+    }, [auth])
+
+    if (user) {
+        return (
+            <div>
+                <h1>Welcome {user.email}</h1>
+                <button onClick={() => auth.signOut()}>Sign Out</button>
+            </div>
+        )
+    }
 
     return (
-
         <div>
-            <h1>Firebase</h1>
-            <SignUp />
+            {/* <SignUp /> */}
+            <Signin />
         </div>
     )
 }
