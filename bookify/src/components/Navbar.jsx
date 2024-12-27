@@ -38,6 +38,14 @@ function MinimalNavbar() {
                                 </Nav.Link>
                             </>
                         )}
+                        {firebase.isLoggedin && (
+                            <>
+                                <Nav.Link as={Link} to="/add-listing">
+                                    Add Listing
+                                </Nav.Link>
+                            </>
+                        )}
+
                     </Nav>
                     {firebase.isLoggedin && (
                         <Button variant="outline-danger" onClick={handleLogout}>
