@@ -2,7 +2,7 @@ import { Toaster } from "react-hot-toast";
 import MinimalNavbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
 
-import { Login, Register, AddListing } from "./pages/index"
+import { Login, Register, AddListing, Home } from "./pages/index"
 
 export default function App() {
   return (
@@ -10,7 +10,7 @@ export default function App() {
       <Toaster />
       <MinimalNavbar />
       <Routes>
-        <Route path="/" element={<h1>Home</h1>} />
+        <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/add-listing" element={<AddListing />} />

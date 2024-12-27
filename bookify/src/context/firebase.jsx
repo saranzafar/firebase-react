@@ -9,7 +9,13 @@ import {
     onAuthStateChanged,
 } from "firebase/auth";
 import toast from "react-hot-toast";
-import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    Timestamp,
+    getDocs
+} from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCM8pP_oV6cTZtP_sYnK_Pfw4iWTHWNSqA",
@@ -108,12 +114,10 @@ export const FirebaseProvider = (props) => {
     }
 
     const uploadToCloudinary = async (file) => {
-        console.log("File: ", file);
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "react-firebase");
         formData.append("folder", "react-firebase");
-        console.log("Form data: ", formData);
 
         try {
             const response = await fetch(
@@ -165,6 +169,15 @@ export const FirebaseProvider = (props) => {
         }
     };
 
+    const listAllBooks = async () => {
+        try {
+            return getDocs(collection(fireStore, "books"))
+        } catch (error) {
+            toast.error(error.message || "Failed to fetch Books. Please try again.");
+            throw error;
+        }
+    }
+
 
     return (
         <FirebaseContext.Provider
@@ -177,6 +190,7 @@ export const FirebaseProvider = (props) => {
                 user,
                 loading,
                 handleCreateNewListing,
+                listAllBooks,
             }}
         >
             {props.children}
