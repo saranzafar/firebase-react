@@ -1,16 +1,19 @@
-import "bootstrap/dist/css/bootstrap.min.css"
-import { Routes, Route } from "react-router-dom"
-import { Login, Register } from "./pages/index"
+import { Toaster } from "react-hot-toast";
+import MinimalNavbar from "./components/Navbar";
+import { Route, Routes } from "react-router-dom";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
-
-function App() {
+export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<h1>Home</h1>} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-    </Routes>
-  )
+    <>
+      <Toaster />
+      <MinimalNavbar />
+      <Routes>
+        <Route path="/" element={<h1>Home</h1>} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </>
+  );
 }
-
-export default App

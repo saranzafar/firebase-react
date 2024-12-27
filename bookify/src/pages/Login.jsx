@@ -1,38 +1,50 @@
-import { useEffect, useState } from 'react'
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { useNavigate } from 'react-router-dom';
-
-import { UseFirebase } from "../context/firebase"
+import { useEffect, useState } from "react";
+import { UseFirebase } from "../context/firebase";
+import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import { Form, Button } from "react-bootstrap";
 
 function Login() {
     const firebase = UseFirebase();
-    console.log("firebase", firebase);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Logining user");
-        await firebase.signinUserWithEmailAndPassword(email, password)
-        console.log("Login success");
-    }
+        try {
+            await firebase.signinUserWithEmailAndPassword(email, password);
+            navigate("/");
+        } catch (error) {
+            console.error("Error during login:", error);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        await firebase.signinWithGoogle();
+        navigate("/");
+    };
 
     useEffect(() => {
         if (firebase.isLoggedin) {
-            navigate("/")
+            navigate("/");
         }
-    }, [firebase.isLoggedin, navigate])
-
+    }, [firebase.isLoggedin, navigate]);
 
     return (
         <div className="container mt-5">
+            <Toaster />
             <h1>Login</h1>
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control onChange={e => setEmail(e.target.value)} type="email" placeholder="Enter email" />
+                    <Form.Control
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email"
+                        placeholder="Enter email"
+                        required
+                    />
                     <Form.Text className="text-muted">
                         We&apos;ll never share your email with anyone else.
                     </Form.Text>
@@ -40,16 +52,24 @@ function Login() {
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control onChange={e => setPassword(e.target.value)} type="password" placeholder="Password" />
+                    <Form.Control
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        type="password"
+                        placeholder="Password"
+                        required
+                    />
                 </Form.Group>
                 <Button variant="primary" type="submit">
-                    Create Account
+                    Login
                 </Button>
             </Form>
-            <h1 className='my-3'>Or</h1>
-            <Button variant='danger' onClick={firebase.signinWithGoogle}>Signin with google</Button>
+            <h2 className="my-3">Or</h2>
+            <Button variant="danger" onClick={handleGoogleLogin}>
+                Sign in with Google
+            </Button>
         </div>
-    )
+    );
 }
 
-export default Login
+export default Login;
