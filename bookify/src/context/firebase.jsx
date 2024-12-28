@@ -14,7 +14,12 @@ import {
     collection,
     addDoc,
     Timestamp,
-    getDocs
+    getDocs,
+    doc,
+    getDoc,
+    query,
+    where,
+    deleteDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -178,6 +183,90 @@ export const FirebaseProvider = (props) => {
         }
     }
 
+    const getBookById = async (id) => {
+        const docRef = doc(fireStore, "books", id);
+        try {
+            const docSnapshot = await getDoc(docRef);
+            if (docSnapshot.exists()) {
+                return {
+                    id: docSnapshot.id, // Add the document ID
+                    ...docSnapshot.data(), // Spread the document's data
+                };
+            } else {
+                throw new Error("Book not found!"); // Handle case where document doesn't exist
+            }
+        } catch (error) {
+            toast.error(error.message || "Failed to fetch the book. Please try again.");
+            throw error;
+        }
+    };
+
+    const placeOrder = async (id, qty) => {
+
+        try {
+            if (!user || !user.uid) {
+                console.error("User  is not authenticated");
+                throw new Error("Please Login to Place the Order");
+            }
+
+            const collectionRef = collection(fireStore, "books", id, "orders")
+            const result = await addDoc(collectionRef, {
+                usernID: user.uid,
+                username: user.displayName,
+                userEmail: user.email,
+                photoURL: user.photoURL,
+                qty: Number(qty),
+            });
+            toast.success("Order Placed");
+            return result;
+
+        } catch (error) {
+            toast.error(error.message || "Failed to Place Order. Please try again.");
+            throw error;
+        }
+    }
+
+    const fetchMyBooks = async (userId) => {
+        if (!user || !user.uid) {
+            throw new Error("User is Not Authenticated!");
+        }
+
+        try {
+            const collectionRef = collection(fireStore, "books");
+            const q = query(collectionRef, where("userID", "==", user.uid));
+            const result = await getDocs(q);
+            return result;
+        } catch (error) {
+            console.error("Error fetching orders: ", error);
+            toast.error(error.message || "Error fetching orders. Please try again.");
+            return null;
+        }
+
+    }
+
+    const getOrders = async (bookId) => {
+        try {
+            const collectionRef = collection(fireStore, "books", bookId, "orders");
+            const result = await getDocs(collectionRef);
+            return result;
+        } catch (error) {
+            console.error("Error fetching orders: ", error);
+            return null;
+        }
+
+    }
+
+    const deleteOrder = async (bookId, orderId) => {
+        try {
+            const orderRef = doc(fireStore, "books", bookId, "orders", orderId);
+            await deleteDoc(orderRef);
+            toast.success(`Order with ID ${orderId} deleted successfully!`);
+        } catch (error) {
+            toast.error("Failed to delete the order. Please try again.");
+            console.error("Error deleting the order:", error);
+            throw error;
+        }
+    };
 
     return (
         <FirebaseContext.Provider
@@ -191,6 +280,11 @@ export const FirebaseProvider = (props) => {
                 loading,
                 handleCreateNewListing,
                 listAllBooks,
+                getBookById,
+                placeOrder,
+                fetchMyBooks,
+                getOrders,
+                deleteOrder,
             }}
         >
             {props.children}

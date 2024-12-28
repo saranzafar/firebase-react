@@ -43,6 +43,9 @@ function MinimalNavbar() {
                                 <Nav.Link as={Link} to="/add-listing">
                                     Add Listing
                                 </Nav.Link>
+                                <Nav.Link as={Link} to="/orders">
+                                    Orders
+                                </Nav.Link>
                             </>
                         )}
 
