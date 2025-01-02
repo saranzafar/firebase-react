@@ -1,10 +1,18 @@
 import { Toaster } from "react-hot-toast";
 import MinimalNavbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
-
+import { UseFirebase } from "./context/firebase";
 import { Login, Register, AddListing, Home, BookDetails, Orders, ViewOrderDetail } from "./pages/index"
+import { useEffect } from "react";
 
 export default function App() {
+  const firebase = UseFirebase();
+
+  useEffect(() => {
+    const permission = firebase.requestPermission()
+    console.log("Permissionss: ", permission);
+
+  }, [firebase])
   return (
     <>
       <Toaster />

@@ -21,6 +21,8 @@ import {
     where,
     deleteDoc,
 } from "firebase/firestore";
+import { getMessaging } from "firebase/messaging"
+import { getToken } from "firebase/messaging";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCM8pP_oV6cTZtP_sYnK_Pfw4iWTHWNSqA",
@@ -34,8 +36,9 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
-const googleProvider = new GoogleAuthProvider();
 const fireStore = getFirestore(firebaseApp);
+const messaging = getMessaging(firebaseApp)
+const googleProvider = new GoogleAuthProvider();
 
 const FirebaseContext = createContext(null);
 export const UseFirebase = () => useContext(FirebaseContext);
@@ -268,6 +271,15 @@ export const FirebaseProvider = (props) => {
         }
     };
 
+    const requestPermission = async () => {
+        const permission = await Notification.requestPermission()
+        if (permission === "granted") {
+            const token = await getToken(messaging, { vapidKey: "BP8JIKpAeYMQ-YZBGLRdgYDDFc0PCEvG44lG_ulEYZStAE4kI2DHSkiDeR8bXLGlbLZDGUEFCvR-rASnBCUoFEo" });
+            console.log("Token generated: ", token);
+
+        }
+    }
+
     return (
         <FirebaseContext.Provider
             value={{
@@ -285,6 +297,7 @@ export const FirebaseProvider = (props) => {
                 fetchMyBooks,
                 getOrders,
                 deleteOrder,
+                requestPermission,
             }}
         >
             {props.children}
