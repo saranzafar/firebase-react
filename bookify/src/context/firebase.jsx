@@ -21,8 +21,7 @@ import {
     where,
     deleteDoc,
 } from "firebase/firestore";
-import { getMessaging } from "firebase/messaging"
-import { getToken } from "firebase/messaging";
+import { getMessaging, onMessage, getToken } from "firebase/messaging"
 
 const firebaseConfig = {
     apiKey: "AIzaSyCM8pP_oV6cTZtP_sYnK_Pfw4iWTHWNSqA",
@@ -272,12 +271,32 @@ export const FirebaseProvider = (props) => {
     };
 
     const requestPermission = async () => {
-        const permission = await Notification.requestPermission()
-        if (permission === "granted") {
-            const token = await getToken(messaging, { vapidKey: "BP8JIKpAeYMQ-YZBGLRdgYDDFc0PCEvG44lG_ulEYZStAE4kI2DHSkiDeR8bXLGlbLZDGUEFCvR-rASnBCUoFEo" });
-            console.log("Token generated: ", token);
-
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                // Get the token
+                // const token = await getToken(messaging, { vapidKey: 'BP8JIKpAeYMQ-YZBGLRdgYDDFc0PCEvG44lG_ulEYZStAE4kI2DHSkiDeR8bXLGlbLZDGUEFCvR-rASnBCUoFEo' });
+                // console.log('FCM Token:', token);
+                // TODO: Send the token to your server to store and use for sending notifications
+            } else {
+                console.log('Notification permission denied.');
+                toast.error(`Notification permission denied.`);
+            }
+        } catch (error) {
+            console.error('Error requesting notification permission:', error);
+            toast.error(`Error requesting notification permission`);
         }
+    }
+
+    const handleIncomingMessages = async () => {
+        const unsubscribe = onMessage(messaging, (payload) => {
+            console.log('Message received. ', payload);
+            if (payload.notification) {
+                toast(payload.notification.body);
+            }
+        });
+        return () => unsubscribe();
     }
 
     return (
@@ -298,6 +317,7 @@ export const FirebaseProvider = (props) => {
                 getOrders,
                 deleteOrder,
                 requestPermission,
+                handleIncomingMessages,
             }}
         >
             {props.children}

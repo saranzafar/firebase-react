@@ -1,101 +1,94 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UseFirebase } from "../context/firebase";
-import { Container, Row, Col, Card, Table, Badge, Button } from "react-bootstrap";
-import toast from "react-hot-toast";
+import { Table, Button, Spinner } from "react-bootstrap";
+import { toast } from "react-hot-toast";
 
 function ViewOrderDetail() {
-    const params = useParams();
+    const { bookId } = useParams();
     const firebase = UseFirebase();
     const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const orderDocs = await firebase.getOrders(params.bookId);
-                const fetchedOrders = orderDocs.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setOrders(fetchedOrders);
+                const orderSnapshots = await firebase.getOrders(bookId);
+                setOrders(orderSnapshots.docs);
             } catch (error) {
-                toast.error("Failed to fetch orders. Please try again.");
                 console.error("Error fetching orders:", error);
+                toast.error("Failed to load orders.");
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchOrders();
-    }, [firebase, params.bookId]);
+    }, [firebase, bookId]);
 
     const handleDelete = async (orderId) => {
         try {
-            await firebase.deleteOrder(params.bookId, orderId);
-            setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
-            toast.success("Order deleted successfully!");
+            await firebase.deleteOrder(bookId, orderId);
+            setOrders(orders.filter((order) => order.id !== orderId));
+            toast.success("Order deleted successfully.");
         } catch (error) {
-            toast.error("Failed to delete the order. Please try again.");
             console.error("Error deleting order:", error);
+            toast.error("Failed to delete order.");
         }
     };
 
-    if (orders.length === 0) {
+    if (loading) {
         return (
-            <Container className="text-center my-5">
-                <h3 className="text-primary">No Orders Found</h3>
-            </Container>
+            <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ height: "50vh" }}
+            >
+                <Spinner animation="border" variant="primary" />
+            </div>
         );
     }
 
     return (
-        <Container className="my-5">
-            <h1 className="text-center text-primary mb-4">Order Details</h1>
-            <Row className="justify-content-center">
-                <Col lg={10}>
-                    <Card className="shadow-sm border-0">
-                        <Card.Body>
-                            <Table striped bordered hover responsive>
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer Name</th>
-                                        <th>Email</th>
-                                        <th>Quantity</th>
-                                        <th>Order Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orders.map((order) => (
-                                        <tr key={order.id}>
-                                            <td>
-                                                <Badge bg="primary">{order.id}</Badge>
-                                            </td>
-                                            <td>{order.username || "N/A"}</td>
-                                            <td>{order.userEmail || "N/A"}</td>
-                                            <td>{order.qty || "N/A"}</td>
-                                            <td>
-                                                {order.orderDate && order.orderDate.seconds
-                                                    ? new Date(order.date.seconds * 1000).toLocaleDateString()
-                                                    : "N/A"}
-                                            </td>
-                                            <td>
-                                                <Button
-                                                    variant="danger"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(order.id)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
+        <div className="container mt-4">
+            <h1 className="text-center mb-4">Orders</h1>
+            {orders?.length > 0 ? (
+                <Table striped bordered hover responsive>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Customer Email</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders?.map((order) => {
+                            const orderData = order._document.data.value.mapValue.fields;
+
+                            return (
+                                <tr key={order.id}>
+                                    <td>{order.id}</td>
+                                    <td>{orderData.username?.stringValue || "N/A"}</td>
+                                    <td>{orderData.userEmail?.stringValue || "N/A"}</td>
+                                    <td>{orderData.qty?.integerValue || "N/A"}</td>
+                                    <td>
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => handleDelete(order.id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </Table>
+            ) : (
+                <p className="text-center">No orders found.</p>
+            )}
+        </div>
     );
 }
 

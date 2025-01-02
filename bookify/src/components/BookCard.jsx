@@ -1,40 +1,32 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { Card, Button, Badge } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-function BookCard(props) {
+function BookCard({ id, name, coverPic, displayName, price, isbn, link }) {
     const navigate = useNavigate();
 
     return (
         <Card className="shadow-sm h-100">
             <Card.Img
                 variant="top"
-                src={props.coverPic}
-                alt={`${props.name} cover`}
-                style={{
-                    height: "200px",
-                    objectFit: "cover",
-                    borderBottom: "2px solid #f0f0f0",
-                }}
+                src={coverPic}
+                alt={`${name} cover`}
+                style={{ height: '200px', objectFit: 'cover' }}
             />
             <Card.Body>
-                <Card.Title className="text-primary mb-3">{props.name}</Card.Title>
-                <Card.Text>
-                    <span className="d-block text-muted mb-2">
-                        Sold by: <strong>{props.displayName}</strong>
+                <Card.Title className="mb-2">{name}</Card.Title>
+                <Card.Text className="mb-3">
+                    <span className="d-block text-muted mb-1">
+                        Sold by: <strong>{displayName}</strong>
                     </span>
-                    <Badge bg="success" className="me-2">
-                        ${props.price}
+                    <Badge bg="success" className="me-1">
+                        Price: ${price}
                     </Badge>
-                    <Badge bg="secondary">ISBN: {props.isbn}</Badge>
+                    <Badge bg="secondary">
+                        ISBN: {isbn}
+                    </Badge>
                 </Card.Text>
-                <Button
-                    variant="primary"
-                    className="w-100 mt-3"
-                    onClick={() => navigate(props.link)}
-                >
+                <Button variant="primary" className="w-100" onClick={() => navigate(link)}>
                     View Details
                 </Button>
             </Card.Body>
